@@ -152,3 +152,67 @@ Safety:
 - It does not modify cron configurations or system permissions.
 
 Status: Initial implementation, practical validation, and unit testing completed.
+
+### Module 6: Systemd Services Security Scanner
+Date: 22 November 2026
+
+Status: Initial implementation, practical validation, and unit testing completed.
+
+Features implemented:
+- Read-only systemd service discovery.
+- Inspection of service properties and execution configuration.
+- Inspection of systemd unit files and drop-in configuration paths.
+- Extraction and inspection of referenced executable paths.
+- Extraction and inspection of environment file paths.
+- Ownership and permission checks for inspected paths.
+- Identification of root-running services as informational observations.
+- Detection of potentially unsafe service configuration permissions.
+- Detection of missing or inaccessible referenced executables.
+- Error collection during service inspection.
+
+Unit testing:
+- Systemd scanner tests: 16 passed.
+- Complete project test suite: 65 passed.
+- Additional subtests: 11 passed.
+- Failed tests: 0.
+
+Practical validation:
+- Systemd services scanned: 115.
+- Security findings: 2.
+- Scan errors: 0.
+- Informational observations: 106.
+
+Observed findings:
+1. HIGH: Group-writable systemd unit file:
+   /etc/systemd/system/grub-install-devices.service
+2. LOW: Referenced executable missing or inaccessible:
+   /usr/local/sbin/set-grub-install-devices
+
+Finding interpretation:
+The group-writable unit file is owned by root:root. The current
+Kali user is not a member of the root group, so group-write
+permissions do not establish that the current user can modify it.
+The finding requires contextual review and is not proof of
+an exploitable privilege-escalation path.
+
+The missing executable is a configuration inconsistency and
+does not independently establish a security vulnerability.
+
+Limitations:
+- Service command parsing is heuristic and may not resolve every
+  systemd execution syntax or environment variable.
+- Some service properties and files may be inaccessible to
+  unprivileged users.
+- Root-running services are informational observations, not
+  automatic security findings.
+- A missing executable may be intentional or conditional.
+- Permission findings require ownership, group membership,
+  and execution-context review.
+
+Safety:
+- The scanner uses read-only systemd queries and filesystem inspection.
+- It does not start, stop, reload, or modify services.
+- It never executes discovered service commands or scripts.
+
+Status: Initial implementation, practical validation, and
+automated testing completed.
