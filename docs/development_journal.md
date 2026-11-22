@@ -13,10 +13,10 @@ Features:
 - Kernel information
 - User and group information
 - System architecture
-- Collection timestamp
+   - Collection timestamp
 
 ### Module 2: SUID/SGID Scanner
-Status: Initial implementation completed
+Sta tus: Initial implementation completed
 Tests: 5 passed
 Features:
 - SUID binary discovery
@@ -216,3 +216,57 @@ Safety:
 
 Status: Initial implementation, practical validation, and
 automated testing completed.
+## 22 November 2026 — Module 7: Linux Capabilities Scanner
+
+### Objective
+Develop a detection-only Linux capabilities scanner to identify files with assigned Linux capabilities and inspect their ownership and permissions.
+
+### Implementation
+- Integrated `getcap` for recursive capability discovery.
+- Implemented capability output parsing.
+- Identified capability names and flags.
+- Inspected file ownership, group and permissions.
+- Added contextual checks for high-risk capabilities.
+- Added checks for group-writable and world-writable capability-enabled files.
+- Implemented error handling for missing utilities and scan timeouts.
+
+### Practical Environment
+- Operating System: Kali Linux
+- Python: 3.13.15
+- Capability utility: `/usr/sbin/getcap`
+
+### Practical Results
+Two capability-enabled files were identified:
+
+1. `/usr/bin/dumpcap`
+   - Capabilities: `cap_net_admin,cap_net_raw=eip`
+   - Owner: root
+   - Group: wireshark
+   - Permissions: 754
+
+2. `/usr/bin/fping`
+   - Capabilities: `cap_net_raw=ep`
+   - Owner: root
+   - Group: root
+   - Permissions: 755
+
+The scanner reported zero contextual findings and zero execution errors.
+
+### Testing
+- Module 7 unit tests: 12 passed.
+- Complete project test suite: 77 passed.
+- Additional subtests: 11 passed.
+- Failed tests: 0.
+
+### Security and Safety
+The scanner performs read-only discovery and metadata inspection. It does not modify capabilities, change permissions or execute discovered binaries.
+
+Capability assignments are not automatically classified as vulnerabilities. Their necessity and access controls require contextual review.
+
+### Current Limitations
+- Capability risk classification requires further contextual refinement.
+- Filesystem traversal and permission-related edge cases require additional testing.
+- Kernel vulnerability assessment is handled by a separate planned module.
+
+### Status
+Implementation and initial testing completed. Documentation review and GitHub commit pending.
